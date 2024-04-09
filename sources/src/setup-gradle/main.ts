@@ -3,6 +3,7 @@ import * as core from '@actions/core'
 import * as setupGradle from '../setup-gradle'
 import * as gradle from '../execution/gradle'
 import * as dependencyGraph from '../dependency-graph'
+import * as deprecator from '../deprecation-collector'
 import {BuildScanConfig, CacheConfig, DependencyGraphConfig, getArguments} from '../input-params'
 
 /**
@@ -18,6 +19,8 @@ export async function run(): Promise<void> {
 
         const args: string[] = getArguments()
         await gradle.provisionAndMaybeExecute(args)
+
+        deprecator.saveState()
     } catch (error) {
         core.setFailed(String(error))
         if (error instanceof Error && error.stack) {

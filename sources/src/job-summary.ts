@@ -4,6 +4,7 @@ import {RequestError} from '@octokit/request-error'
 
 import {BuildResult} from './build-results'
 import {SummaryConfig, getGithubToken} from './input-params'
+import * as deprecator from './deprecation-collector'
 
 export async function generateJobSummary(
     buildResults: BuildResult[],
@@ -83,6 +84,7 @@ function renderSummaryTable(results: BuildResult[]): string {
     }
 
     return `
+DEPRECATIONS: ${deprecator.getDeprecationMessages().join(', ')}
 <table>
     <tr>
         <th>Gradle Root Project</th>

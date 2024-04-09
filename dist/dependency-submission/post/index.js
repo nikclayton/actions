@@ -92676,6 +92676,66 @@ run();
 
 /***/ }),
 
+/***/ 2572:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.restoreState = exports.saveState = exports.maybeEmitDeprecationWarning = exports.getDeprecationMessages = exports.recordDeprecation = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const recordedDeprecations = [];
+function recordDeprecation(message) {
+    recordedDeprecations.push(message);
+}
+exports.recordDeprecation = recordDeprecation;
+function getDeprecationMessages() {
+    return recordedDeprecations;
+}
+exports.getDeprecationMessages = getDeprecationMessages;
+function maybeEmitDeprecationWarning() {
+    if (recordedDeprecations.length > 0) {
+        core.warning(`The Job ${github.context.job} uses deprecated functionality. Consult the Job Summary for more details.`);
+    }
+}
+exports.maybeEmitDeprecationWarning = maybeEmitDeprecationWarning;
+function saveState() {
+    core.saveState('deprecations', JSON.stringify(recordedDeprecations));
+}
+exports.saveState = saveState;
+function restoreState() {
+    const stringRep = core.getState('deprecations');
+    recordedDeprecations.push(...JSON.parse(stringRep));
+}
+exports.restoreState = restoreState;
+
+
+/***/ }),
+
 /***/ 6976:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -92733,6 +92793,7 @@ exports.parseNumericInput = exports.getWorkspaceDirectory = exports.getGithubTok
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const cache = __importStar(__nccwpck_require__(7799));
+const deprecator = __importStar(__nccwpck_require__(2572));
 const summary_1 = __nccwpck_require__(1327);
 const string_argv_1 = __nccwpck_require__(9663);
 class DependencyGraphConfig {
@@ -92917,6 +92978,9 @@ function getBuildRootDirectory() {
 exports.getBuildRootDirectory = getBuildRootDirectory;
 function getArguments() {
     const input = core.getInput('arguments');
+    if (input.length !== 0) {
+        deprecator.recordDeprecation('Using the action to execute Gradle via the `arguments` parameter is deprecated');
+    }
     return (0, string_argv_1.parseArgsStringToArgv)(input);
 }
 exports.getArguments = getArguments;
@@ -93002,6 +93066,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const request_error_1 = __nccwpck_require__(537);
 const input_params_1 = __nccwpck_require__(3885);
+const deprecator = __importStar(__nccwpck_require__(2572));
 function generateJobSummary(buildResults, cachingReport, config) {
     return __awaiter(this, void 0, void 0, function* () {
         const summaryTable = renderSummaryTable(buildResults);
@@ -93070,6 +93135,7 @@ function renderSummaryTable(results) {
         return 'No Gradle build results detected.';
     }
     return `
+DEPRECATIONS: ${deprecator.getDeprecationMessages().join(', ')}
 <table>
     <tr>
         <th>Gradle Root Project</th>

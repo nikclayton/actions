@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as setupGradle from '../setup-gradle'
 import * as dependencyGraph from '../dependency-graph'
+import * as deprecator from '../deprecation-collector'
 
 import {CacheConfig, DependencyGraphConfig, SummaryConfig} from '../input-params'
 import {PostActionJobFailure} from '../errors'
@@ -15,6 +16,9 @@ process.on('uncaughtException', e => handleFailure(e))
  */
 export async function run(): Promise<void> {
     try {
+        deprecator.restoreState()
+        deprecator.maybeEmitDeprecationWarning()
+
         if (await setupGradle.complete(new CacheConfig(), new SummaryConfig())) {
             // Only submit the dependency graphs once per job
             await dependencyGraph.complete(new DependencyGraphConfig())
