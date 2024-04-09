@@ -14,8 +14,11 @@ export function getDeprecationMessages(): string[] {
 export function maybeEmitDeprecationWarning(): void {
     if (recordedDeprecations.length > 0) {
         core.warning(
-            `The Job ${github.context.job} uses deprecated functionality. Consult the Job Summary for more details.`
+            `The Job ${github.context.job} uses deprecated functionality.\nConsult the Job Summary for more details.`
         )
+        for (const deprecation of recordedDeprecations) {
+            core.info(`Deprecation: ${deprecation}`)
+        }
     }
 }
 

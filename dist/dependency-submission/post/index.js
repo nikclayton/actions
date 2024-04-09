@@ -92719,7 +92719,10 @@ function getDeprecationMessages() {
 exports.getDeprecationMessages = getDeprecationMessages;
 function maybeEmitDeprecationWarning() {
     if (recordedDeprecations.length > 0) {
-        core.warning(`The Job ${github.context.job} uses deprecated functionality. Consult the Job Summary for more details.`);
+        core.warning(`The Job ${github.context.job} uses deprecated functionality.\nConsult the Job Summary for more details.`);
+        for (const deprecation of recordedDeprecations) {
+            core.info(`Deprecation: ${deprecation}`);
+        }
     }
 }
 exports.maybeEmitDeprecationWarning = maybeEmitDeprecationWarning;
@@ -92963,6 +92966,11 @@ class BuildScanConfig {
         const newProp = core.getInput(newPropName);
         if (newProp !== '') {
             return newProp;
+        }
+        const oldProp = core.getInput(oldPropName);
+        if (oldProp !== '') {
+            deprecator.recordDeprecation('The `build-scan-terms-of-service` input parameters have been renamed');
+            return oldProp;
         }
         return core.getInput(oldPropName);
     }

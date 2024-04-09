@@ -215,6 +215,11 @@ export class BuildScanConfig {
         if (newProp !== '') {
             return newProp
         }
+        const oldProp = core.getInput(oldPropName)
+        if (oldProp !== '') {
+            deprecator.recordDeprecation('The `build-scan-terms-of-service` input parameters have been renamed')
+            return oldProp
+        }
         return core.getInput(oldPropName)
     }
 }
